@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Projects | No Fluff{% endblock %}
+{% block content %}
+<header class="page-heading">
+  <div>
+    <p class="eyebrow">PROJECT PORTFOLIO</p>
+    <h1>Keep delivery practical.</h1>
+    <p class="intro">Track projects, capture the assessment and generate a client-ready package.</p>
+  </div>
+</header>
+
+<section class="metric-grid" aria-label="Project counts">
+  {% for status in statuses %}
+    <div class="metric">
+      <strong>{{ counts.get(status, 0) }}</strong>
+      <span>{{ status }}</span>
+    </div>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">NEW PROJECT</p>
+      <h2>Add a project</h2>
+    </div>
+  </div>
+  <form method="post" action="{{ url_for('create_project') }}" class="form-grid">
+    <label>Project name<input name="name" required maxlength="100"></label>
+    <label>Client<input name="client" maxlength="100"></label>
+    <label>Owner<input name="owner" maxlength="100"></label>
+    <label>Due date<input name="due_date" type="date"></label>
+    <label>Status
+      <select name="status">
+        {% for status in statuses %}<option>{{ status }}</option>{% endfor %}
+      </select>
+    </label>
+    <button type="submit">Create project</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">CURRENT WORK</p>
+      <h2>Projects</h2>
+    </div>
+    <span class="count">{{ projects|length }} total</span>
+  </div>
+  {% if projects %}
+    <div class="project-list">
+      {% for project in projects %}
+        <a class="project-row" href="{{ url_for('project_detail', project_id=project.id) }}">
+          <div>
+            <strong>{{ project.name }}</strong>
+            <span>{{ project.client or "No client set" }} · {{ project.owner or "No owner" }}</span>
+          </div>
+          <div class="project-meta">
+            <span class="status status-{{ project.status|lower|replace(' ', '-') }}">{{ project.status }}</span>
+            {% if project.overdue %}<span class="overdue">Overdue</span>{% endif %}
+            <span>{{ project.project_type or "Not assessed" }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty">No projects yet. Add the first one above.</p>
+  {% endif %}
+</section>
+{% endblock %}

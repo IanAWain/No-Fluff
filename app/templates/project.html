@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} | No Fluff{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('dashboard') }}">Back to projects</a>
+<header class="page-heading project-heading">
+  <div>
+    <p class="eyebrow">PROJECT</p>
+    <h1>{{ project.name }}</h1>
+    <p class="intro">
+      {{ project.client or "No client set" }}
+      {% if project.project_type %} · Likely type: <strong>{{ project.project_type }}</strong>{% endif %}
+    </p>
+  </div>
+  <span class="status status-{{ project.status|lower|replace(' ', '-') }}">{{ project.status }}</span>
+</header>
+
+<form method="post" action="{{ url_for('update_project', project_id=project.id) }}" class="panel project-form">
+  <div class="section-heading">
+    <div><p class="eyebrow">PROJECT CONTROL</p><h2>Project details</h2></div>
+    <button type="submit" class="secondary-button">Save changes</button>
+  </div>
+  <div class="form-grid">
+    <label>Project name<input name="name" value="{{ project.name }}" required maxlength="100"></label>
+    <label>Client<input name="client" value="{{ project.client }}" maxlength="100"></label>
+    <label>Owner<input name="owner" value="{{ project.owner }}" maxlength="100"></label>
+    <label>Due date<input name="due_date" type="date" value="{{ project.due_date }}"></label>
+    <label>Status
+      <select name="status">
+        {% for status in statuses %}
+          <option {% if status == project.status %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <label class="assessment-label">Assessment text
+    <textarea name="assessment" rows="12" placeholder="Describe the outcome, route, dependencies, risks and current uncertainty.">{{ project.assessment }}</textarea>
+  </label>
+</form>
+
+<section class="panel package-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">CLIENT PACKAGE</p>
+      <h2>Generate handover files</h2>
+    </div>
+  </div>
+  <p class="intro">Creates the No Fluff PDF report, PowerPoint handover deck, email and ZIP.</p>
+  <form method="post" action="{{ url_for('generate_project_files', project_id=project.id) }}" class="generate-form">
+    <input type="hidden" name="assessment" value="{{ project.assessment }}">
+    <label>Client email<input name="email" type="email" inputmode="email" placeholder="client@example.com"></label>
+    <button type="submit">Generate client package</button>
+  </form>
+
+  {% if files %}
+    <div class="downloads">
+      {% for file in files %}
+        <a class="download {% if file.primary %}primary{% endif %}"
+           href="{{ url_for('download', run_id=project.run_id, filename=file.name) }}"
+           download="{{ file.name }}">
+          <span>{% if file.primary %}Download all files (ZIP){% else %}{{ file.name }}{% endif %}</span>
+          <small>{{ (file.size / 1024)|round|int }} KB</small>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
