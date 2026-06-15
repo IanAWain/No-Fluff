@@ -19,7 +19,7 @@ from flask import (
     url_for,
 )
 
-from .server import RUNS_DIR, SAFE_FILENAME, generate_package
+from server import RUNS_DIR, SAFE_FILENAME, generate_package
 
 
 APP_DIR = Path(__file__).resolve().parent
