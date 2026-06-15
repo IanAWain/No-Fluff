@@ -33,7 +33,7 @@ def utc_now() -> str:
 
 
 def create_app(test_config: dict | None = None) -> Flask:
-    app = Flask(__name__, template_folder="templates", static_folder="static")
+    app = Flask(__name__, template_folder="app/templates", static_folder="static")
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY", "development-only-change-me"),
         DATABASE=os.environ.get("DATABASE_PATH", str(DEFAULT_DATABASE)),
